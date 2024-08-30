@@ -1,0 +1,37 @@
+welcome: "Welcome to Step of Faith!"
+ban:
+  success: "Пользователь {username} успешно заблокирован."
+  failure: "Не удалось заблокировать пользователя."
+  banned: "Простите, но у вас нет прав для выполнения этой команды."
+unban:
+  success: "Пользователь {username} успешно разблокирован."
+  failure: "Не удалось разблокировать пользователя."
+button:
+  menu:
+    text: "Меню:"
+    btn_text: "Меню"
+    schedule: "Расписание"
+    appointment: "Душепопечение"
+    question: "Вопросы/Ответы"
+    feedback: "FeedBack"
+    social_networks: "Подпишись"
+    church_schedule: "Церковные служения"
+  social_networks:
+    text: "Мы в сети:"
+    telegram: "Telegram"
+    instagram: "Instagram"
+    telegram_url: "https://t.me/stepoffaith"
+    instagram_url: "https://instagram.com/step.of.faithh"
+  schedule:
+    text: |
+      Расписание:
+      🔸 point 1
+      🔸 point 2
+      🔸 point 3
+  church_schedule:
+    text: |
+      Расписание служений в церкви:
+      🔸 point 1
+      🔸 point 2
+      🔸 point 3
+  cancel: "Назад"
