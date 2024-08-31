@@ -5,9 +5,11 @@ import os
 from dotenv import load_dotenv
 import gspread
 
+import user_utils
 
-now = datetime.datetime.now() - datetime.timedelta(minutes=5)
-schedule = []
+time_reload = 10
+now = datetime.datetime.now() - datetime.timedelta(minutes=time_reload)
+result: str
 
 read = load_dotenv('.env')
 
@@ -36,14 +38,16 @@ def write_feedback(feedback: str) -> None:
 
 # get schedule from sheet
 def get_schedule() -> list:
-    global schedule
-    global now
+    global result  # noqa: PLW0603
+    global now  # noqa: PLW0603
     difference = datetime.datetime.now() - now
-    if difference >= datetime.timedelta(minutes=5):
+    if difference >= datetime.timedelta(minutes=time_reload):
         sheet = book.get_worksheet_by_id(72452919)
         schedule = sheet.get_all_values()
+        schedule.pop(0)
         now = datetime.datetime.now()
-    return schedule
+        result = user_utils.make_schedule_text(schedule)
+    return result
 
 
 # write to talk with clergyman

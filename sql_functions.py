@@ -43,9 +43,9 @@ def is_admin(user_id: int) -> bool:
 def change_ban_status(username: str, ban: bool) -> None:
     with sqlite3.connect(database) as cursor:
         data = cursor.execute('SELECT ban FROM users WHERE username = ?', (username,)).fetchone()
-    if data is not None:
-        if data[0] != ban:
-            cursor.execute('UPDATE users SET ban = ? WHERE username = ?', (ban, username))
-            return True
-    else:
-        return False
+        if data is not None:
+            if data[0] != ban:
+                cursor.execute('UPDATE users SET ban = ? WHERE username = ?', (ban, username))
+                return True
+        else:
+            return False

@@ -70,7 +70,7 @@ def function_show_menu(callback: types.CallbackQuery) -> None:
 
 # function for getting schedule
 def function_show_schedule(callback: types.CallbackQuery) -> None:
-    schedule_text = user_utils.make_schedule_text(sheets.get_schedule())
+    schedule_text = sheets.get_schedule()
     keyboard = types.InlineKeyboardMarkup(row_width=1)
     cancel = types.InlineKeyboardButton(
         text=replies['button']['cancel'],
@@ -87,7 +87,47 @@ def function_show_schedule(callback: types.CallbackQuery) -> None:
 
 # function for make an appointment with a clergyman
 def function_make_appointment(callback: types.CallbackQuery) -> None:
-    pass
+    keyboard = types.InlineKeyboardMarkup(row_width=2)
+    counselor_1_bnt = types.InlineKeyboardButton(
+        text=replies['button']['appointment']['counselor_1'],
+        callback_data='func_counselor_1'
+    )
+    counselor_2_bnt = types.InlineKeyboardButton(
+        text=replies['button']['appointment']['counselor_2'],
+        callback_data='func_counselor_2'
+    )
+    counselor_3_bnt = types.InlineKeyboardButton(
+        text=replies['button']['appointment']['counselor_3'],
+        callback_data='func_counselor_3'
+    )
+    counselor_4_bnt = types.InlineKeyboardButton(
+        text=replies['button']['appointment']['counselor_4'],
+        callback_data='func_counselor_4'
+    )
+    counselor_5_bnt = types.InlineKeyboardButton(
+        text=replies['button']['appointment']['counselor_5'],
+        callback_data='func_counselor_5'
+    )
+    counselor_6_bnt = types.InlineKeyboardButton(
+        text=replies['button']['appointment']['counselor_6'],
+        callback_data='func_counselor_6'
+    )
+    cancel = types.InlineKeyboardButton(
+        text=replies['button']['cancel'],
+        callback_data='func_menu'
+    )
+    keyboard.add(
+        counselor_1_bnt, counselor_2_bnt,
+        counselor_3_bnt, counselor_4_bnt,
+        counselor_5_bnt, counselor_6_bnt,
+        cancel
+    )
+    bot.edit_message_text(
+        chat_id=callback.message.chat.id,
+        message_id=callback.message.id,
+        text=replies['button']['appointment']['text'],
+        reply_markup=keyboard
+    )
 
 
 # function for write question
@@ -102,7 +142,7 @@ def function_write_feedback(callback: types.CallbackQuery) -> None:
 
 # function send social network
 def function_show_social_networks(callback: types.CallbackQuery) -> None:
-    keyboard = types.InlineKeyboardMarkup(row_width=1)
+    keyboard = types.InlineKeyboardMarkup(row_width=2)
     telegram_btn = types.InlineKeyboardButton(
         text=replies['button']['social_networks']['telegram'],
         url=replies['button']['social_networks']['telegram_url']
