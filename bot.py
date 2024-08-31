@@ -52,15 +52,10 @@ def function_show_menu(callback: types.CallbackQuery) -> None:
         text=replies['button']['menu']['church_schedule'],
         callback_data='func_church_schedule'
     )
-    cancel = types.InlineKeyboardButton(
-        text=replies['button']['cancel'],
-        callback_data='func_cancel'
-    )
     keyboard.add(
         btn_schedule, btn_appointment,
         btn_question, btn_feedback,
         btn_social_networks, btn_church_schedule,
-        cancel
     )
     bot.edit_message_text(
         chat_id=callback.message.chat.id,
@@ -106,14 +101,6 @@ def function_make_appointment(callback: types.CallbackQuery) -> None:
         text=replies['button']['appointment']['counselor_4'],
         callback_data='func_counselor_4'
     )
-    counselor_5_bnt = types.InlineKeyboardButton(
-        text=replies['button']['appointment']['counselor_5'],
-        callback_data='func_counselor_5'
-    )
-    counselor_6_bnt = types.InlineKeyboardButton(
-        text=replies['button']['appointment']['counselor_6'],
-        callback_data='func_counselor_6'
-    )
     cancel = types.InlineKeyboardButton(
         text=replies['button']['cancel'],
         callback_data='func_menu'
@@ -121,7 +108,6 @@ def function_make_appointment(callback: types.CallbackQuery) -> None:
     keyboard.add(
         counselor_1_bnt, counselor_2_bnt,
         counselor_3_bnt, counselor_4_bnt,
-        counselor_5_bnt, counselor_6_bnt,
         cancel
     )
     bot.edit_message_text(
@@ -144,7 +130,7 @@ def function_write_feedback(callback: types.CallbackQuery) -> None:
 
 # function send social network
 def function_show_social_networks(callback: types.CallbackQuery) -> None:
-    keyboard = types.InlineKeyboardMarkup(row_width=2)
+    keyboard = types.InlineKeyboardMarkup(row_width=1)
     telegram_btn = types.InlineKeyboardButton(
         text=replies['button']['social_networks']['telegram'],
         url=replies['button']['social_networks']['telegram_url']
@@ -227,8 +213,6 @@ def check_callback_data(callback: types.CallbackQuery) -> None:
         function_show_social_networks(callback)
     elif callback.data == 'func_church_schedule':
         function_show_church_schedule(callback)
-    elif callback.data == 'func_cancel':
-        bot.delete_message(chat_id=callback.message.chat.id, message_id=callback.message.id)
 
 
 # command ban
