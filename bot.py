@@ -8,8 +8,8 @@ import yaml
 
 import google_sheets_module as sheets
 import sql_functions
-import user_util
-import util
+import user_utils
+import utils
 
 
 read = load_dotenv(".env")
@@ -20,7 +20,7 @@ with open("replies.yaml", encoding="utf-8") as f:
 
 bot = telebot.TeleBot(token)
 
-logger = util.get_logger(__name__)
+logger = utils.get_logger(__name__)
 
 
 # function show menu
@@ -70,6 +70,7 @@ def function_show_menu(callback: types.CallbackQuery) -> None:
 
 # function for getting schedule
 def function_show_schedule(callback: types.CallbackQuery) -> None:
+    schedule_text = user_utils.make_schedule_text(sheets.get_schedule())
     keyboard = types.InlineKeyboardMarkup(row_width=1)
     cancel = types.InlineKeyboardButton(
         text=replies['button']['cancel'],
@@ -79,7 +80,7 @@ def function_show_schedule(callback: types.CallbackQuery) -> None:
     bot.edit_message_text(
         chat_id=callback.message.chat.id,
         message_id=callback.message.id,
-        text=replies['button']['schedule']['text'],
+        text=schedule_text,
         reply_markup=keyboard
     )
 
@@ -193,7 +194,7 @@ def check_callback_data(callback: types.CallbackQuery) -> None:
 def ban(message: types.Message) -> None:
     if not sql_functions.is_banned(message.from_user.id):
         if sql_functions.is_admin(message.from_user.id):
-            username = user_util.select_username_from_text(message.text[5:])
+            username = user_utils.select_username_from_text(message.text[5:])
             completed = sql_functions.change_ban_status(username, 1)
             if completed:
                 bot.send_message(
@@ -211,7 +212,7 @@ def ban(message: types.Message) -> None:
 def unban(message: types.Message) -> None:
     if not sql_functions.is_banned(message.from_user.id):
         if sql_functions.is_admin(message.from_user.id):
-            username = user_util.select_username_from_text(message.text[7:])
+            username = user_utils.select_username_from_text(message.text[7:])
             completed = sql_functions.change_ban_status(username, 0)
             if completed:
                 bot.send_message(

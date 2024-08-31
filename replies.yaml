@@ -12,8 +12,8 @@ button:
     btn_text: "Меню"
     schedule: "Расписание"
     appointment: "Душепопечение"
-    question: "Вопросы/Ответы"
-    feedback: "FeedBack"
+    question: "Задать вопрос"
+    feedback: "feedback"
     social_networks: "Подпишись"
     church_schedule: "Церковные служения"
   social_networks:
@@ -23,11 +23,9 @@ button:
     telegram_url: "https://t.me/stepoffaith"
     instagram_url: "https://instagram.com/step.of.faithh"
   schedule:
-    text: |
-      Расписание:
-      🔸 point 1
-      🔸 point 2
-      🔸 point 3
+    text:
+      head: "Расписание:"
+      body: "\n🔸 {time}  {event}"
   church_schedule:
     text: |
       Расписание служений в церкви:
