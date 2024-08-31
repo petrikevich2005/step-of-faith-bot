@@ -6,8 +6,8 @@ import telebot
 from telebot import types
 import yaml
 
-import google_sheets_module as sheets
-import sql_functions
+from google_sheets import GoogleSheets
+import sqlite
 import user_utils
 import utils
 
@@ -21,6 +21,8 @@ with open("replies.yaml", encoding="utf-8") as f:
 bot = telebot.TeleBot(token)
 
 logger = utils.get_logger(__name__)
+
+sheets = GoogleSheets()
 
 
 # function show menu
@@ -189,9 +191,9 @@ def echo(message: types.Message) -> None:
 # command start
 @bot.message_handler(commands=["start", "help", "menu"])
 def menu(message: telebot.types.Message) -> None:
-    if not sql_functions.check_user_id(message.from_user.id):
-        sql_functions.add_to_database(message.from_user.id, message.from_user.username)
-    if not sql_functions.is_banned(message.from_user.id):
+    if not sqlite.check_user_id(message.from_user.id):
+        sqlite.add_to_database(message.from_user.id, message.from_user.username)
+    if not sqlite.is_banned(message.from_user.id):
         keyboard = types.InlineKeyboardMarkup(row_width=1)
         menu_btn = types.InlineKeyboardButton(
             text=replies['button']['menu']['btn_text'],
@@ -232,10 +234,10 @@ def check_callback_data(callback: types.CallbackQuery) -> None:
 # command ban
 @bot.message_handler(regexp="^/ban ")
 def ban(message: types.Message) -> None:
-    if not sql_functions.is_banned(message.from_user.id):
-        if sql_functions.is_admin(message.from_user.id):
+    if not sqlite.is_banned(message.from_user.id):
+        if sqlite.is_admin(message.from_user.id):
             username = user_utils.select_username_from_text(message.text[5:])
-            completed = sql_functions.change_ban_status(username, 1)
+            completed = sqlite.change_ban_status(username, 1)
             if completed:
                 bot.send_message(
                     message.from_user.id,
@@ -250,10 +252,10 @@ def ban(message: types.Message) -> None:
 # command ban
 @bot.message_handler(regexp="^/unban ")
 def unban(message: types.Message) -> None:
-    if not sql_functions.is_banned(message.from_user.id):
-        if sql_functions.is_admin(message.from_user.id):
+    if not sqlite.is_banned(message.from_user.id):
+        if sqlite.is_admin(message.from_user.id):
             username = user_utils.select_username_from_text(message.text[7:])
-            completed = sql_functions.change_ban_status(username, 0)
+            completed = sqlite.change_ban_status(username, 0)
             if completed:
                 bot.send_message(
                     message.from_user.id,
