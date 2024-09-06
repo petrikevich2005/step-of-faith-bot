@@ -9,18 +9,19 @@ import user_utils
 
 
 class GoogleSheets:
+    TIME_RELOAD = 10
+    READ = load_dotenv('.env')
+
+    CREDENTIALS_FILE = os.getenv('GOOGLE_SHEETS_CREDENTIALS_FILE')
+    TOKEN = os.getenv('GOOGLE_SHEETS_TOKEN')
+
+
     def __init__(self) -> None:
-        self.time_reload = 10
-        self.now = datetime.datetime.now() - datetime.timedelta(minutes=self.time_reload)
+        self.now = datetime.datetime.now() - datetime.timedelta(minutes=self.TIME_RELOAD)
         self.result: str
 
-        self.read = load_dotenv('.env')
-
-        self.credentials_file = os.getenv('GOOGLE_SHEETS_CREDENTIALS_FILE')
-        self.token = os.getenv('GOOGLE_SHEETS_TOKEN')
-
-        self.client = gspread.service_account(filename=self.credentials_file)
-        self.book = self.client.open_by_key(self.token)
+        self.client = gspread.service_account(filename=self.CREDENTIALS_FILE)
+        self.book = self.client.open_by_key(self.TOKEN)
 
 
     # write question to sheet
@@ -42,7 +43,7 @@ class GoogleSheets:
     # get schedule from sheet
     def get_schedule(self) -> list:
         difference = datetime.datetime.now() - self.now
-        if difference >= datetime.timedelta(minutes=self.time_reload):
+        if difference >= datetime.timedelta(minutes=self.TIME_RELOAD):
             sheet = self.book.get_worksheet_by_id(72452919)
             schedule = sheet.get_all_values()
             schedule.pop(0)
