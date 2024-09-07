@@ -28,8 +28,48 @@ calendar = GoogleCalendar()
 
 # for callback data
 waiting_for_question = []
-waiting_for_user_info = []
 waiting_for_feedback = []
+waiting_for_user_info = {}
+
+
+# make an appointment with a counselor 1
+def function_counselor_1(callback: types.CallbackQuery) -> None:
+    waiting_for_user_info[str(callback.from_user.id)] = {'progress': 0, 'counselor': 1}
+    bot.delete_message(chat_id=callback.message.chat.id, message_id=callback.message.id)
+    bot.send_message(
+        callback.from_user.id,
+        replies['button']['appointment']['counselor']['first_name']
+    )
+
+
+# make an appointment with a counselor 2
+def function_counselor_2(callback: types.CallbackQuery) -> None:
+    waiting_for_user_info[str(callback.from_user.id)] = {'progress': 0, 'counselor': 2}
+    bot.delete_message(chat_id=callback.message.chat.id, message_id=callback.message.id)
+    bot.send_message(
+        callback.from_user.id,
+        replies['button']['appointment']['counselor']['first_name']
+    )
+
+
+# make an appointment with a counselor 3
+def function_counselor_3(callback: types.CallbackQuery) -> None:
+    waiting_for_user_info[str(callback.from_user.id)] = {'progress': 0, 'counselor': 3}
+    bot.delete_message(chat_id=callback.message.chat.id, message_id=callback.message.id)
+    bot.send_message(
+        callback.from_user.id,
+        replies['button']['appointment']['counselor']['first_name']
+    )
+
+
+# make an appointment with a counselor 4
+def function_counselor_4(callback: types.CallbackQuery) -> None:
+    waiting_for_user_info[str(callback.from_user.id)] = {'progress': 0, 'counselor': 4}
+    bot.delete_message(chat_id=callback.message.chat.id, message_id=callback.message.id)
+    bot.send_message(
+        callback.from_user.id,
+        replies['button']['appointment']['counselor']['first_name']
+    )
 
 
 # function show menu
@@ -89,7 +129,7 @@ def function_show_schedule(callback: types.CallbackQuery) -> None:
     )
 
 
-# function for make an appointment with a clergyman
+# function for make an appointment with a counselor
 def function_make_appointment(callback: types.CallbackQuery) -> None:
     keyboard = types.InlineKeyboardMarkup(row_width=2)
     counselor_1_bnt = types.InlineKeyboardButton(
@@ -226,6 +266,14 @@ def check_callback_data(callback: types.CallbackQuery) -> None:
         function_show_social_networks(callback)
     elif callback.data == 'func_church_schedule':
         function_show_church_schedule(callback)
+    elif callback.data == 'func_counselor_1':
+        function_counselor_1(callback)
+    elif callback.data == 'func_counselor_2':
+        function_counselor_2(callback)
+    elif callback.data == 'func_counselor_3':
+        function_counselor_3(callback)
+    elif callback.data == 'func_counselor_4':
+        function_counselor_4(callback)
 
 
 # command ban
@@ -283,7 +331,30 @@ def answer_for_feedback(message: types.Message) -> None:
 # check for user info
 @bot.message_handler(func=lambda message: str(message.from_user.id) in waiting_for_user_info)
 def answer_for_user_info(message: types.Message) -> None:
-    print("user_info")
+    data = waiting_for_user_info[str(message.from_user.id)]
+    if data['progress'] == 0:
+        data['first_name'] = message.text
+        data['progress'] = 1
+        bot.send_message(
+            message.from_user.id,
+            replies['button']['appointment']['counselor']['second_name']
+        )
+    elif data['progress'] == 1:
+        data['second_name'] = message.text
+        data['progress'] = 2
+        bot.send_message(
+            message.from_user.id,
+            replies['button']['appointment']['counselor']['phone']
+        )
+    elif data['progress'] == 2:
+        data['phone'] = message.text
+        sheets.write_to_talk(
+            data['counselor'], [data['first_name'], data['second_name'], data['phone']]
+        )
+        bot.send_message(
+            message.from_user.id,
+            replies['button']['appointment']['counselor']['success']
+        )
 
 
 # RUN BOT

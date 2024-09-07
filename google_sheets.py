@@ -52,9 +52,11 @@ class GoogleSheets:
         return self.result
 
 
-    # write to talk with clergyman
-    def write_to_talk(self, clergyman: int, user_data: list) -> None:
-        sheet = self.book.get_worksheet_by_id(406103439)
+    # write to talk with counselor
+    def write_to_talk(self, counselor: int, user_data: list) -> None:
+        sheet = self.book.get_worksheet_by_id(
+            user_utils.get_sheet_id(counselor)
+        )
         current_data = sheet.get_all_values()
         data = [*current_data, user_data]
         sheet.update(data)
