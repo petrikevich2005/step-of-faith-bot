@@ -227,6 +227,29 @@ def echo(message: types.Message) -> None:
     bot.send_message(message.from_user.id, message.text[5:])
 
 
+# command cancel
+@bot.message_handler(commands=["cancel"])
+def cancel(message: telebot.types.Message) -> None:
+    if str(message.from_user.id) in waiting_for_question:
+        waiting_for_question.remove(str(message.from_user.id))
+        bot.send_message(
+            message.from_user.id,
+            replies['button']['ask_question']['cancel']
+        )
+    elif str(message.from_user.id) in waiting_for_feedback:
+        waiting_for_feedback.remove(str(message.from_user.id))
+        bot.send_message(
+            message.from_user.id,
+            replies['button']['feedback']['cancel']
+        )
+    elif str(message.from_user.id) in waiting_for_user_info:
+        del waiting_for_user_info[str(message.from_user.id)]
+        bot.send_message(
+            message.from_user.id,
+            replies['button']['appointment']['counselor']['cancel']
+        )
+
+
 # command start
 @bot.message_handler(commands=["start", "help", "menu"])
 def menu(message: telebot.types.Message) -> None:
