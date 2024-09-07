@@ -6,6 +6,7 @@ import telebot
 from telebot import types
 import yaml
 
+from google_calendar import GoogleCalendar
 from google_sheets import GoogleSheets
 import sqlite
 import user_utils
@@ -23,6 +24,12 @@ bot = telebot.TeleBot(token)
 logger = utils.get_logger(__name__)
 
 sheets = GoogleSheets()
+calendar = GoogleCalendar()
+
+# for callback data
+waiting_for_question = []
+waiting_for_user_info = []
+waiting_for_feedback = []
 
 
 # function show menu
@@ -120,12 +127,18 @@ def function_make_appointment(callback: types.CallbackQuery) -> None:
 
 # function for write question
 def function_ask_question(callback: types.CallbackQuery) -> None:
-    pass
+    if str(callback.from_user.id) not in waiting_for_question:
+        waiting_for_question.append(str(callback.from_user.id))
+    bot.delete_message(chat_id=callback.message.chat.id, message_id=callback.message.id)
+    bot.send_message(callback.from_user.id, replies['button']['ask_question']['text'])
 
 
 # function for write feedback
 def function_write_feedback(callback: types.CallbackQuery) -> None:
-    pass
+    if str(callback.from_user.id) not in waiting_for_feedback:
+        waiting_for_feedback.append(str(callback.from_user.id))
+    bot.delete_message(chat_id=callback.message.chat.id, message_id=callback.message.id)
+    bot.send_message(callback.from_user.id, replies['button']['feedback']['text'])
 
 
 # function send social network
@@ -249,6 +262,28 @@ def unban(message: types.Message) -> None:
                 bot.send_message(message.from_user.id, replies['unban']['failure'])
     else:
         bot.send_message(message.from_user.id, replies['ban']['banned'])
+
+
+# check for answer
+@bot.message_handler(func=lambda message: str(message.from_user.id) in waiting_for_question)
+def answer_for_question(message: types.Message) -> None:
+    waiting_for_question.remove(str(message.from_user.id))
+    sheets.write_question(message.text)
+    bot.send_message(message.from_user.id, replies['button']['ask_question']['success'])
+
+
+# check for feedback
+@bot.message_handler(func=lambda message: str(message.from_user.id) in waiting_for_feedback)
+def answer_for_feedback(message: types.Message) -> None:
+    waiting_for_feedback.remove(str(message.from_user.id))
+    sheets.write_feedback(message.text)
+    bot.send_message(message.from_user.id, replies['button']['feedback']['success'])
+
+
+# check for user info
+@bot.message_handler(func=lambda message: str(message.from_user.id) in waiting_for_user_info)
+def answer_for_user_info(message: types.Message) -> None:
+    print("user_info")
 
 
 # RUN BOT

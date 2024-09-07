@@ -38,4 +38,10 @@ button:
     counselor_2: "Некто Бацькавич"
     counselor_3: "Некто Бацькавич"
     counselor_4: "Некто Бацькавич"
+  ask_question:
+    text: "Задайте свой вопрос:"
+    success: "Вопрос успешно записан."
+  feedback:
+    text: "Напишите свой отзыв:"
+    success: "Отзыв успешно записан."
   cancel: "Назад"

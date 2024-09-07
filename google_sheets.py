@@ -12,7 +12,7 @@ class GoogleSheets:
     TIME_RELOAD = 10
     READ = load_dotenv('.env')
 
-    CREDENTIALS_FILE = os.getenv('GOOGLE_SHEETS_CREDENTIALS_FILE')
+    CREDENTIALS_FILE = os.getenv('GOOGLE_CREDENTIALS_FILE')
     TOKEN = os.getenv('GOOGLE_SHEETS_TOKEN')
 
 
