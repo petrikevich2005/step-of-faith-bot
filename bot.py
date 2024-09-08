@@ -6,7 +6,6 @@ import telebot
 from telebot import types
 import yaml
 
-from google_calendar import GoogleCalendar
 from google_sheets import GoogleSheets
 import sqlite
 import user_utils
@@ -24,7 +23,6 @@ bot = telebot.TeleBot(token)
 logger = utils.get_logger(__name__)
 
 sheets = GoogleSheets()
-calendar = GoogleCalendar()
 
 # for callback data
 waiting_for_question = []
@@ -232,22 +230,27 @@ def echo(message: types.Message) -> None:
 def cancel(message: telebot.types.Message) -> None:
     if str(message.from_user.id) in waiting_for_question:
         waiting_for_question.remove(str(message.from_user.id))
-        bot.send_message(
-            message.from_user.id,
-            replies['button']['ask_question']['cancel']
-        )
+        text = replies['button']['ask_question']['cancel']
+
     elif str(message.from_user.id) in waiting_for_feedback:
         waiting_for_feedback.remove(str(message.from_user.id))
-        bot.send_message(
-            message.from_user.id,
-            replies['button']['feedback']['cancel']
-        )
+        text = replies['button']['feedback']['cancel']
+
     elif str(message.from_user.id) in waiting_for_user_info:
         del waiting_for_user_info[str(message.from_user.id)]
-        bot.send_message(
-            message.from_user.id,
-            replies['button']['appointment']['counselor']['cancel']
-        )
+        text = replies['button']['appointment']['counselor']['cancel']
+
+    keyboard = types.InlineKeyboardMarkup(row_width=1)
+    menu_btn = types.InlineKeyboardButton(
+        text=replies['button']['back'],
+        callback_data='func_menu'
+    )
+    keyboard.add(menu_btn)
+    bot.send_message(
+        message.from_user.id,
+        text,
+        reply_markup=keyboard
+    )
 
 
 # command start
@@ -340,7 +343,17 @@ def unban(message: types.Message) -> None:
 def answer_for_question(message: types.Message) -> None:
     waiting_for_question.remove(str(message.from_user.id))
     sheets.write_question(message.text)
-    bot.send_message(message.from_user.id, replies['button']['ask_question']['success'])
+    keyboard = types.InlineKeyboardMarkup(row_width=1)
+    back_to_menu_btn = types.InlineKeyboardButton(
+        text=replies['button']['back'],
+        callback_data='func_menu'
+    )
+    keyboard.add(back_to_menu_btn)
+    bot.send_message(
+        message.from_user.id,
+        replies['button']['ask_question']['success'],
+        reply_markup=keyboard
+    )
 
 
 # check for feedback
@@ -348,7 +361,17 @@ def answer_for_question(message: types.Message) -> None:
 def answer_for_feedback(message: types.Message) -> None:
     waiting_for_feedback.remove(str(message.from_user.id))
     sheets.write_feedback(message.text)
-    bot.send_message(message.from_user.id, replies['button']['feedback']['success'])
+    keyboard = types.InlineKeyboardMarkup(row_width=1)
+    back_to_menu_btn = types.InlineKeyboardButton(
+        text=replies['button']['back'],
+        callback_data='func_menu'
+    )
+    keyboard.add(back_to_menu_btn)
+    bot.send_message(
+        message.from_user.id,
+        replies['button']['feedback']['success'],
+        reply_markup=keyboard
+    )
 
 
 # check for user info
@@ -374,9 +397,17 @@ def answer_for_user_info(message: types.Message) -> None:
         sheets.write_to_talk(
             data['counselor'], [data['first_name'], data['second_name'], data['phone']]
         )
+        del waiting_for_user_info[str(message.from_user.id)]
+        keyboard = types.InlineKeyboardMarkup(row_width=1)
+        back_to_menu_btn = types.InlineKeyboardButton(
+            text=replies['button']['back'],
+            callback_data='func_menu'
+        )
+        keyboard.add(back_to_menu_btn)
         bot.send_message(
             message.from_user.id,
-            replies['button']['appointment']['counselor']['success']
+            replies['button']['appointment']['counselor']['success'],
+            reply_markup=keyboard
         )
 
 
