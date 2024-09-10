@@ -225,6 +225,79 @@ def echo(message: types.Message) -> None:
     bot.send_message(message.from_user.id, message.text[5:])
 
 
+# check for answer
+@bot.message_handler(func=lambda message: str(message.from_user.id) in waiting_for_question)
+def answer_for_question(message: types.Message) -> None:
+    waiting_for_question.remove(str(message.from_user.id))
+    sheets.write_question(message.text)
+    keyboard = types.InlineKeyboardMarkup(row_width=1)
+    back_to_menu_btn = types.InlineKeyboardButton(
+        text=replies['button']['back'],
+        callback_data='func_menu'
+    )
+    keyboard.add(back_to_menu_btn)
+    bot.send_message(
+        message.from_user.id,
+        replies['button']['ask_question']['success'],
+        reply_markup=keyboard
+    )
+
+
+# check for feedback
+@bot.message_handler(func=lambda message: str(message.from_user.id) in waiting_for_feedback)
+def answer_for_feedback(message: types.Message) -> None:
+    waiting_for_feedback.remove(str(message.from_user.id))
+    sheets.write_feedback(message.text)
+    keyboard = types.InlineKeyboardMarkup(row_width=1)
+    back_to_menu_btn = types.InlineKeyboardButton(
+        text=replies['button']['back'],
+        callback_data='func_menu'
+    )
+    keyboard.add(back_to_menu_btn)
+    bot.send_message(
+        message.from_user.id,
+        replies['button']['feedback']['success'],
+        reply_markup=keyboard
+    )
+
+
+# check for user info
+@bot.message_handler(func=lambda message: str(message.from_user.id) in waiting_for_user_info)
+def answer_for_user_info(message: types.Message) -> None:
+    data = waiting_for_user_info[str(message.from_user.id)]
+    if data['progress'] == 0:
+        data['first_name'] = message.text
+        data['progress'] = 1
+        bot.send_message(
+            message.from_user.id,
+            replies['button']['appointment']['counselor']['second_name']
+        )
+    elif data['progress'] == 1:
+        data['second_name'] = message.text
+        data['progress'] = 2
+        bot.send_message(
+            message.from_user.id,
+            replies['button']['appointment']['counselor']['phone']
+        )
+    elif data['progress'] == 2:
+        data['phone'] = message.text
+        sheets.write_to_talk(
+            data['counselor'], [data['first_name'], data['second_name'], data['phone']]
+        )
+        del waiting_for_user_info[str(message.from_user.id)]
+        keyboard = types.InlineKeyboardMarkup(row_width=1)
+        back_to_menu_btn = types.InlineKeyboardButton(
+            text=replies['button']['back'],
+            callback_data='func_menu'
+        )
+        keyboard.add(back_to_menu_btn)
+        bot.send_message(
+            message.from_user.id,
+            replies['button']['appointment']['counselor']['success'],
+            reply_markup=keyboard
+        )
+
+
 # command cancel
 @bot.message_handler(commands=["cancel"])
 def cancel(message: telebot.types.Message) -> None:
@@ -336,79 +409,6 @@ def unban(message: types.Message) -> None:
                 bot.send_message(message.from_user.id, replies['unban']['failure'])
     else:
         bot.send_message(message.from_user.id, replies['ban']['banned'])
-
-
-# check for answer
-@bot.message_handler(func=lambda message: str(message.from_user.id) in waiting_for_question)
-def answer_for_question(message: types.Message) -> None:
-    waiting_for_question.remove(str(message.from_user.id))
-    sheets.write_question(message.text)
-    keyboard = types.InlineKeyboardMarkup(row_width=1)
-    back_to_menu_btn = types.InlineKeyboardButton(
-        text=replies['button']['back'],
-        callback_data='func_menu'
-    )
-    keyboard.add(back_to_menu_btn)
-    bot.send_message(
-        message.from_user.id,
-        replies['button']['ask_question']['success'],
-        reply_markup=keyboard
-    )
-
-
-# check for feedback
-@bot.message_handler(func=lambda message: str(message.from_user.id) in waiting_for_feedback)
-def answer_for_feedback(message: types.Message) -> None:
-    waiting_for_feedback.remove(str(message.from_user.id))
-    sheets.write_feedback(message.text)
-    keyboard = types.InlineKeyboardMarkup(row_width=1)
-    back_to_menu_btn = types.InlineKeyboardButton(
-        text=replies['button']['back'],
-        callback_data='func_menu'
-    )
-    keyboard.add(back_to_menu_btn)
-    bot.send_message(
-        message.from_user.id,
-        replies['button']['feedback']['success'],
-        reply_markup=keyboard
-    )
-
-
-# check for user info
-@bot.message_handler(func=lambda message: str(message.from_user.id) in waiting_for_user_info)
-def answer_for_user_info(message: types.Message) -> None:
-    data = waiting_for_user_info[str(message.from_user.id)]
-    if data['progress'] == 0:
-        data['first_name'] = message.text
-        data['progress'] = 1
-        bot.send_message(
-            message.from_user.id,
-            replies['button']['appointment']['counselor']['second_name']
-        )
-    elif data['progress'] == 1:
-        data['second_name'] = message.text
-        data['progress'] = 2
-        bot.send_message(
-            message.from_user.id,
-            replies['button']['appointment']['counselor']['phone']
-        )
-    elif data['progress'] == 2:
-        data['phone'] = message.text
-        sheets.write_to_talk(
-            data['counselor'], [data['first_name'], data['second_name'], data['phone']]
-        )
-        del waiting_for_user_info[str(message.from_user.id)]
-        keyboard = types.InlineKeyboardMarkup(row_width=1)
-        back_to_menu_btn = types.InlineKeyboardButton(
-            text=replies['button']['back'],
-            callback_data='func_menu'
-        )
-        keyboard.add(back_to_menu_btn)
-        bot.send_message(
-            message.from_user.id,
-            replies['button']['appointment']['counselor']['success'],
-            reply_markup=keyboard
-        )
 
 
 # RUN BOT
